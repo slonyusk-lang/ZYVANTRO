@@ -1,1 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ZYVANTRO — AI Dropshipping</title>
+<style>
+  :root {
+    --bg: #0a0b10;
+    --panel: #12141c;
+    --panel-2: #1a1d28;
+    --line: #242838;
+    --text: #e8ecf4;
+    --muted: #8b93a7;
+    --accent: #7c5cff;
+    --accent-2: #22d3ee;
+    --green: #22c55e;
+    --red: #ef4444;
+    --amber: #f59e0b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    background: radial-gradient(1200px 600px at 20% -10%, #1a1440 0%, transparent 50%),
+                radial-gradient(1000px 500px at 100% 0%, #0e3a44 0%, transparent 50%),
+                var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 60px;
+  }
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 32px; border-bottom: 1px solid var(--line);
+    backdrop-filter: blur(10px); background: rgba(10,11,16,0.7);
+    position: sticky; top: 0; z-index: 10;
+  }
+  .logo {
+    font-weight: 900; font-size: 20px; letter-spacing: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .logo small { font-size: 10px; letter-spacing: 1px; color: var(--muted); -webkit-text-fill-color: var(--muted); display: block; font-weight: 500; }
+  nav { display: flex; gap: 4px; background: var(--panel); padding: 4px; border-radius: 10px; border: 1px solid var(--line); }
+  nav button {
+    background: transparent; border: 0; color: var(--muted); padding: 8px 14px;
+    border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; transition: .15s;
+  }
+  nav button:hover { color: var(--text); }
+  nav button.active { background: var(--panel-2); color: var(--text); box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset; }
+  main { max-width: 1180px; margin: 32px auto; padding: 0 24px; }
+  .view { display: none; }
+  .view.active { display: block; animation: fade .2s; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
+  h1 { font-size: 26px; margin-bottom: 6px; letter-spacing: -0.5px; }
+  .sub { color: var(--muted); margin-bottom: 24px; font-size: 14px; }
+
+  .panel {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px;
+  }
+  .grid { display: grid; gap: 16px; }
+  .grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+
+  .stat {
+    background: linear-gradient(160deg, var(--panel-2), var(--panel));
+    border: 1px solid var(--line); border-radius: 14px; padding: 20px;
+    position: relative; overflow: hidden;
+  }
+  .stat::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(400px 100px at 100% 0%, rgba(124,92,255,0.15), transparent);
+  }
+  .stat .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+  .stat .value { font-size: 30px; font-weight: 800; margin-top: 8px; letter-spacing: -1px; }
+
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  input, select, textarea {
+    width: 100%; background: var(--bg); border: 1px solid var(--line);
+    color: var(--text); padding: 11px 13px; border-radius: 10px; font-size: 14px;
+    font-family: inherit; outline: none; transition: .15s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,255,0.15); }
+  .field { margin-bottom: 16px; }
+
+  button.primary {
+    background: linear-gradient(135deg, var(--accent), #5b3fe8);
+    border: 0; color: white; padding: 12px 22px; border-radius: 10px;
+    font-weight: 700; font-size: 14px; cursor: pointer; transition: .15s;
+    box-shadow: 0 6px 20px rgba(124,92,255,0.35);
+  }
+  button.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,92,255,0.5); }
+  button.primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  button.ghost {
+    background: transparent; border: 1px solid var(--line); color: var(--text);
+    padding: 9px 16px; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 600;
+  }
+  button.ghost:hover { border-color: var(--accent); color: var(--accent-2); }
+  button.danger { background: transparent; border: 1px solid var(--red); color: var(--red); padding: 9px 16px; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 600; }
+
+  .product-card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+    overflow: hidden; transition: .2s; display: flex; flex-direction: column;
+  }
+  .product-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .product-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: var(--panel-2); }
+  .product-body { padding: 16px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .product-title { font-weight: 700; font-size: 15px; line-height: 1.3; }
+  .product-desc { color: var(--muted); font-size: 12px; line-height: 1.5; flex: 1; }
+  .product-price { font-size: 22px; font-weight: 800; color: var(--accent-2); letter-spacing: -0.5px; }
+  .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+  .badge.queued { background: rgba(245,158,11,0.15); color: var(--amber); }
+  .badge.processing { background: rgba(34,211,238,0.15); color: var(--accent-2); }
+  .badge.fulfilled { background: rgba(34,197,94,0.15); color: var(--green); }
+  .badge.failed { background: rgba(239,68,68,0.15); color: var(--red); }
+  .badge.supplier { background: rgba(124,92,255,0.15); color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--muted); padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--line); }
+  td { padding: 12px; border-bottom: 1px solid var(--line); }
+
+  .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty .icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px; background: var(--panel-2);
+    border: 1px solid var(--line); color: var(--text); padding: 14px 18px;
+    border-radius: 12px; font-size: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    transform: translateY(100px); opacity: 0; transition: .3s; max-width: 360px; z-index: 100;
+  }
+  .toast.show { transform: none; opacity: 1; }
+  .toast.success { border-left: 4px solid var(--green); }
+  .toast.error { border-left: 4px solid var(--red); }
+  .toast.info { border-left: 4px solid var(--accent-2); }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .muted { color: var(--muted); }
+  .note { background: rgba(124,92,255,0.08); border: 1px solid rgba(124,92,255,0.25); padding: 12px 16px; border-radius: 10px; font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+  .note strong { color: var(--accent-2); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">ZYVANTRO<small>AI DROPSHIPPING ENGINE</small></div>
+  <nav>
+    <button data-view="dashboard" class="active">Dashboard</button>
+    <button data-view="import">Import</button>
+    <button data-view="products">Products</button>
+    <button data-view="orders">Orders</button>
+    <button data-view="settings">Settings</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- DASHBOARD -->
+  <section class="view active" id="dashboard">
+    <h1>Dashboard</h1>
+    <p class="sub">Live overview of your AI dropshipping operation.</p>
+    <div class="grid cols-4">
+      <div class="stat"><div class="label">Products</div><div class="value" id="stat-products">0</div></div>
+      <div class="stat"><div class="label">Orders</div><div class="value" id="stat-orders">0</div></div>
+      <div class="stat"><div class="label">Revenue</div><div class="value" id="stat-revenue">$0</div></div>
+      <div class="stat"><div class="label">Fulfilled</div><div class="value" id="stat-fulfilled">0</div></div>
+    </div>
+    <div style="margin-top:24px" class="panel">
+      <h3 style="margin-bottom:14px">Recent Orders</h3>
+      <div id="recent-orders"></div>
+    </div>
+  </section>
+
+  <!-- IMPORT -->
+  <section class="view" id="import">
+    <h1>Import Product</h1>
+    <p class="sub">Fetch from supplier → AI rewrites copy + prices → publish.</p>
+
+    <div class="note">
+      <strong>Demo mode:</strong> Supplier adapters are simulated. Wire real AliExpress / CJ credentials in production.
+    </div>
+
+    <div class="panel" style="max-width:640px">
+      <div class="field">
+        <label>Supplier</label>
+        <select id="supplier">
+          <option value="mock">Mock Supplier (demo)</option>
+          <option value="aliexpress">AliExpress</option>
+          <option value="cj">CJ Dropshipping</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Product URL</label>
+        <input id="import-url" placeholder="https://example.com/product/123" />
+      </div>
+      <button class="primary" id="btn-import">Import & AI Rewrite</button>
+    </div>
+
+    <div id="import-result" style="margin-top:24px"></div>
+  </section>
+
+  <!-- PRODUCTS -->
+  <section class="view" id="products">
+    <h1>Products</h1>
+    <p class="sub">Your published catalog.</p>
+    <div class="grid cols-3" id="product-grid"></div>
+  </section>
+
+  <!-- ORDERS -->
+  <section class="view" id="orders">
+    <h1>Orders</h1>
+    <p class="sub">All customer orders and their fulfillment state.</p>
+    <div class="panel">
+      <div id="orders-table"></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="view" id="settings">
+    <h1>Settings</h1>
+    <p class="sub">AI key + store configuration.</p>
+
+    <div class="panel" style="max-width:640px">
+      <div class="field">
+        <label>OpenAI API Key (optional)</label>
+        <input id="openai-key" type="password" placeholder="sk-..." />
+        <p class="muted" style="font-size:12px;margin-top:6px">
+          Without a key, the app uses a deterministic fallback copywriter.
+          Key is stored locally in your browser only.
+        </p>
+      </div>
+      <div class="field">
+        <label>Model</label>
+        <input id="openai-model" placeholder="gpt-4o-mini" value="gpt-4o-mini" />
+      </div>
+      <div class="field">
+        <label>Default Markup (%)</label>
+        <input id="markup" type="number" value="250" min="0" />
+      </div>
+      <div class="row">
+        <button class="primary" id="btn-save-settings">Save Settings</button>
+        <button class="danger" id="btn-reset">Reset All Data</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   ZYVANTRO — single-file AI dropshipping app
+   ========================================================= */
+
+/* ---------- Storage ---------- */
+const DB = {
+  get(key, fallback) {
+    try { return JSON.parse(localStorage.getItem('zyvantro_' + key)) ?? fallback; }
+    catch { return fallback; }
+  },
+  set(key, val) { localStorage.setItem('zyvantro_' + key, JSON.stringify(val)); }
+};
+
+let products = DB.get('products', []);
+let orders = DB.get('orders', []);
+let settings = DB.get('settings', {
+  apiKey: '', model: 'gpt-4o-mini', markup: 250
+});
+
+const saveAll = () => {
+  DB.set('products', products);
+  DB.set('orders', orders);
+  DB.set('settings', settings);
+};
+
+/* ---------- Toasts ---------- */
+function toast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className = 'toast ' + type, 3200);
+}
+
+/* ---------- Router ---------- */
+document.querySelectorAll('nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.view).classList.add('active');
+    renderAll();
+  });
+});
+
+/* ---------- Supplier adapters (mock) ---------- */
+const suppliers = {
+  mock: async (url) => ({
+    supplier: 'mock',
+    url,
+    title: 'Wireless Noise-Cancelling Earbuds',
+    description: 'Raw supplier text: BT 5.3, ANC, 24h battery life, IPX5.',
+    basePriceCents: 1299,
+    imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80'
+  }),
+  aliexpress: async (url) => ({
+    supplier: 'aliexpress',
+    url,
+    title: 'AliExpress Sample Product',
+    description: 'Placeholder — connect AliExpress Open Platform API in production.',
+    basePriceCents: 899,
+    imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'
+  }),
+  cj: async (url) => ({
+    supplier: 'cj',
+    url,
+    title: 'CJ Dropshipping Sample Product',
+    description: 'Placeholder — connect CJ OAuth API in production.',
+    basePriceCents: 1599,
+    imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&q=80'
+  })
+};
+
+/* ---------- AI copywriter ---------- */
+async function generateCopy(raw) {
+  const fallbackPrice = Math.round(raw.basePriceCents * (1 + settings.markup / 100));
+  const fallback = {
+    title: raw.title,
+    description: `${raw.title} — premium quality, fast shipping, backed by ZYVANTRO. ${raw.description}`,
+    priceCents: fallbackPrice
+  };
+
+  if (!settings.apiKey) {
+    await new Promise(r => setTimeout(r, 500));
+    return fallback;
+  }
+
+  try {
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + settings.apiKey
+      },
+      body: JSON.stringify({
+        model: settings.model || 'gpt-4o-mini',
+        response_format: { type: 'json_object' },
+        temperature: 0.7,
+        messages: [
+          { role: 'system', content: 'Return only valid JSON.' },
+          { role: 'user', content:
+`You are ZYVANTRO's product copywriter.
+Return strict JSON: { "title": string, "description": string, "priceCents": integer }.
+Title < 70 chars. Description 80-140 words, persuasive.
+Suggested retail in cents should be based on base price ${raw.basePriceCents} with ~${settings.markup}% markup.
+Product: ${JSON.stringify(raw)}` }
+        ]
+      })
+    });
+    if (!res.ok) throw new Error('OpenAI ' + res.status);
+    const data = await res.json();
+    const parsed = JSON.parse(data.choices[0].message.content);
+    return {
+      title: parsed.title || fallback.title,
+      description: parsed.description || fallback.description,
+      priceCents: Number.isInteger(parsed.priceCents) ? parsed.priceCents : fallback.priceCents
+    };
+  } catch (err) {
+    console.error(err);
+    toast('AI failed — used fallback copy', 'error');
+    return fallback;
+  }
+}
+
+/* ---------- Import flow ---------- */
+document.getElementById('btn-import').addEventListener('click', async () => {
+  const supplier = document.getElementById('supplier').value;
+  const url = document.getElementById('import-url').value.trim();
+  if (!url) return toast('Enter a product URL', 'error');
+
+  const btn = document.getElementById('btn-import');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Importing…';
+
+  try {
+    const raw = await suppliers[supplier](url);
+    const copy = await generateCopy(raw);
+
+    const product = {
+      id: Date.now(),
+      supplier,
+      url,
+      title: copy.title,
+      description: copy.description,
+      priceCents: copy.priceCents,
+      imageUrl: raw.imageUrl,
+      createdAt: new Date().toISOString()
+    };
+
+    products.unshift(product);
+    saveAll();
+    renderAll();
+
+    document.getElementById('import-result').innerHTML = `
+      <div class="panel">
+        <div class="row" style="margin-bottom:14px">
+          <span class="badge supplier">${supplier}</span>
+          <span class="muted">Imported just now</span>
+        </div>
+        <div class="row" style="align-items:flex-start">
+          <img src="${product.imageUrl}" style="width:120px;height:120px;border-radius:12px;object-fit:cover" />
+          <div style="flex:1">
+            <div style="font-size:18px;font-weight:800">${escapeHtml(product.title)}</div>
+            <div class="muted" style="margin:8px 0;font-size:13px;line-height:1.5">${escapeHtml(product.description)}</div>
+            <div class="product-price">$${(product.priceCents/100).toFixed(2)}</div>
+          </div>
+        </div>
+      </div>`;
+    toast('Product imported & published', 'success');
+    document.getElementById('import-url').value = '';
+  } catch (err) {
+    toast('Import failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Import & AI Rewrite';
+  }
+});
+
+/* ---------- Order flow ---------- */
+function simulateOrder(productId) {
+  const email = prompt('Customer email for the order:');
+  if (!email) return;
+
+  const order = {
+    id: Date.now(),
+    productId,
+    email,
+    status: 'queued',
+    supplierOrderId: null,
+    createdAt: new Date().toISOString()
+  };
+  orders.unshift(order);
+  saveAll();
+  renderAll();
+  toast('Order placed — queued for fulfillment', 'success');
+
+  // Simulate async worker
+  setTimeout(() => {
+    order.status = 'processing'; saveAll(); renderAll();
+    setTimeout(() => {
+      order.status = 'fulfilled';
+      order.supplierOrderId = 'ZYV-' + order.id;
+      saveAll(); renderAll();
+      toast('Order fulfilled by supplier', 'success');
+    }, 1800);
+  }, 800);
+}
+
+/* ---------- Rendering ---------- */
+function escapeHtml(s = '') {
+  return String(s).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function renderDashboard() {
+  document.getElementById('stat-products').textContent = products.length;
+  document.getElementById('stat-orders').textContent = orders.length;
+  const revenue = orders
+    .filter(o => o.status === 'fulfilled')
+    .reduce((sum, o) => {
+      const p = products.find(p => p.id === o.productId);
+      return sum + (p ? p.priceCents : 0);
+    }, 0);
+  document.getElementById('stat-revenue').textContent = '$' + (revenue / 100).toFixed(2);
+  document.getElementById('stat-fulfilled').textContent =
+    orders.filter(o => o.status === 'fulfilled').length;
+
+  const recent = orders.slice(0, 5);
+  document.getElementById('recent-orders').innerHTML = recent.length
+    ? `<table><thead><tr><th>Order</th><th>Product</th><th>Customer</th><th>Status</th></tr></thead><tbody>
+       ${recent.map(o => {
+         const p = products.find(p => p.id === o.productId);
+         return `<tr>
+           <td>#${o.id.toString().slice(-6)}</td>
+           <td>${p ? escapeHtml(p.title) : '—'}</td>
+           <td>${escapeHtml(o.email)}</td>
+           <td><span class="badge ${o.status}">${o.status}</span></td>
+         </tr>`;
+       }).join('')}
+       </tbody></table>`
+    : `<div class="empty"><div class="icon">📦</div>No orders yet</div>`;
+}
+
+function renderProducts() {
+  const grid = document.getElementById('product-grid');
+  if (!products.length) {
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div cl
