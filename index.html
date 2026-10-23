@@ -44,9 +44,10 @@
   nav button {
     background: transparent; border: 0; color: var(--muted); padding: 8px 14px;
     border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; transition: .15s;
+    font-family: inherit;
   }
   nav button:hover { color: var(--text); }
-  nav button.active { background: var(--panel-2); color: var(--text); box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset; }
+  nav button.active { background: var(--panel-2); color: var(--text); }
   main { max-width: 1180px; margin: 32px auto; padding: 0 24px; }
   .view { display: none; }
   .view.active { display: block; animation: fade .2s; }
@@ -66,11 +67,6 @@
   .stat {
     background: linear-gradient(160deg, var(--panel-2), var(--panel));
     border: 1px solid var(--line); border-radius: 14px; padding: 20px;
-    position: relative; overflow: hidden;
-  }
-  .stat::after {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: radial-gradient(400px 100px at 100% 0%, rgba(124,92,255,0.15), transparent);
   }
   .stat .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
   .stat .value { font-size: 30px; font-weight: 800; margin-top: 8px; letter-spacing: -1px; }
@@ -82,6 +78,28 @@
     font-family: inherit; outline: none; transition: .15s;
   }
   input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,92,255,0.15); }
+
+  /* FIX: dark-mode dropdown options */
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b93a7' stroke-width='3'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+  }
+  select option {
+    background-color: #1a1d28;   /* explicit dark bg */
+    color: #e8ecf4;              /* explicit light text */
+    padding: 10px;
+    font-size: 14px;
+  }
+  select option:checked,
+  select option:hover {
+    background-color: #7c5cff;
+    color: #ffffff;
+  }
+
   .field { margin-bottom: 16px; }
 
   button.primary {
@@ -89,15 +107,11 @@
     border: 0; color: white; padding: 12px 22px; border-radius: 10px;
     font-weight: 700; font-size: 14px; cursor: pointer; transition: .15s;
     box-shadow: 0 6px 20px rgba(124,92,255,0.35);
+    font-family: inherit;
   }
   button.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(124,92,255,0.5); }
   button.primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-  button.ghost {
-    background: transparent; border: 1px solid var(--line); color: var(--text);
-    padding: 9px 16px; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 600;
-  }
-  button.ghost:hover { border-color: var(--accent); color: var(--accent-2); }
-  button.danger { background: transparent; border: 1px solid var(--red); color: var(--red); padding: 9px 16px; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  button.danger { background: transparent; border: 1px solid var(--red); color: var(--red); padding: 11px 18px; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; }
 
   .product-card {
     background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
@@ -148,17 +162,15 @@
 <header>
   <div class="logo">ZYVANTRO<small>AI DROPSHIPPING ENGINE</small></div>
   <nav>
-    <button data-view="dashboard" class="active">Dashboard</button>
-    <button data-view="import">Import</button>
-    <button data-view="products">Products</button>
-    <button data-view="orders">Orders</button>
-    <button data-view="settings">Settings</button>
+    <button type="button" data-view="dashboard" class="active">Dashboard</button>
+    <button type="button" data-view="import">Import</button>
+    <button type="button" data-view="products">Products</button>
+    <button type="button" data-view="orders">Orders</button>
+    <button type="button" data-view="settings">Settings</button>
   </nav>
 </header>
 
 <main>
-
-  <!-- DASHBOARD -->
   <section class="view active" id="dashboard">
     <h1>Dashboard</h1>
     <p class="sub">Live overview of your AI dropshipping operation.</p>
@@ -174,15 +186,10 @@
     </div>
   </section>
 
-  <!-- IMPORT -->
   <section class="view" id="import">
     <h1>Import Product</h1>
     <p class="sub">Fetch from supplier → AI rewrites copy + prices → publish.</p>
-
-    <div class="note">
-      <strong>Demo mode:</strong> Supplier adapters are simulated. Wire real AliExpress / CJ credentials in production.
-    </div>
-
+    <div class="note"><strong>Demo mode:</strong> Supplier adapters are simulated.</div>
     <div class="panel" style="max-width:640px">
       <div class="field">
         <label>Supplier</label>
@@ -196,41 +203,31 @@
         <label>Product URL</label>
         <input id="import-url" placeholder="https://example.com/product/123" />
       </div>
-      <button class="primary" id="btn-import">Import & AI Rewrite</button>
+      <button type="button" class="primary" id="btn-import">Import &amp; AI Rewrite</button>
     </div>
-
     <div id="import-result" style="margin-top:24px"></div>
   </section>
 
-  <!-- PRODUCTS -->
   <section class="view" id="products">
     <h1>Products</h1>
     <p class="sub">Your published catalog.</p>
     <div class="grid cols-3" id="product-grid"></div>
   </section>
 
-  <!-- ORDERS -->
   <section class="view" id="orders">
     <h1>Orders</h1>
     <p class="sub">All customer orders and their fulfillment state.</p>
-    <div class="panel">
-      <div id="orders-table"></div>
-    </div>
+    <div class="panel"><div id="orders-table"></div></div>
   </section>
 
-  <!-- SETTINGS -->
   <section class="view" id="settings">
     <h1>Settings</h1>
     <p class="sub">AI key + store configuration.</p>
-
     <div class="panel" style="max-width:640px">
       <div class="field">
         <label>OpenAI API Key (optional)</label>
         <input id="openai-key" type="password" placeholder="sk-..." />
-        <p class="muted" style="font-size:12px;margin-top:6px">
-          Without a key, the app uses a deterministic fallback copywriter.
-          Key is stored locally in your browser only.
-        </p>
+        <p class="muted" style="font-size:12px;margin-top:6px">Without a key, a deterministic fallback is used. Key stays in your browser.</p>
       </div>
       <div class="field">
         <label>Model</label>
@@ -241,83 +238,85 @@
         <input id="markup" type="number" value="250" min="0" />
       </div>
       <div class="row">
-        <button class="primary" id="btn-save-settings">Save Settings</button>
-        <button class="danger" id="btn-reset">Reset All Data</button>
+        <button type="button" class="primary" id="btn-save-settings">Save Settings</button>
+        <button type="button" class="danger" id="btn-reset">Reset All Data</button>
       </div>
     </div>
   </section>
-
 </main>
 
 <div class="toast" id="toast"></div>
 
 <script>
 /* =========================================================
-   ZYVANTRO — single-file AI dropshipping app
+   ZYVANTRO — fixed single-file app
    ========================================================= */
 
-/* ---------- Storage ---------- */
+/* ---------- safe storage ---------- */
 const DB = {
   get(key, fallback) {
-    try { return JSON.parse(localStorage.getItem('zyvantro_' + key)) ?? fallback; }
-    catch { return fallback; }
+    try {
+      const v = localStorage.getItem('zyvantro_' + key);
+      return v ? JSON.parse(v) : fallback;
+    } catch { return fallback; }
   },
-  set(key, val) { localStorage.setItem('zyvantro_' + key, JSON.stringify(val)); }
+  set(key, val) {
+    try { localStorage.setItem('zyvantro_' + key, JSON.stringify(val)); }
+    catch (e) { console.warn('Storage failed:', e); }
+  }
 };
 
 let products = DB.get('products', []);
-let orders = DB.get('orders', []);
-let settings = DB.get('settings', {
-  apiKey: '', model: 'gpt-4o-mini', markup: 250
-});
+let orders   = DB.get('orders', []);
+let settings = DB.get('settings', { apiKey: '', model: 'gpt-4o-mini', markup: 250 });
 
-const saveAll = () => {
+function saveAll() {
   DB.set('products', products);
   DB.set('orders', orders);
   DB.set('settings', settings);
-};
+}
 
-/* ---------- Toasts ---------- */
+/* ---------- toast ---------- */
+let toastTimer;
 function toast(msg, type = 'info') {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.className = 'toast show ' + type;
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.className = 'toast ' + type, 3200);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = 'toast ' + type; }, 3200);
 }
 
-/* ---------- Router ---------- */
+/* ---------- nav router ---------- */
 document.querySelectorAll('nav button').forEach(btn => {
-  btn.addEventListener('click', () => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById(btn.dataset.view).classList.add('active');
+    const view = document.getElementById(btn.dataset.view);
+    if (view) view.classList.add('active');
     renderAll();
   });
 });
 
-/* ---------- Supplier adapters (mock) ---------- */
+/* ---------- suppliers ---------- */
 const suppliers = {
   mock: async (url) => ({
-    supplier: 'mock',
-    url,
+    supplier: 'mock', url,
     title: 'Wireless Noise-Cancelling Earbuds',
     description: 'Raw supplier text: BT 5.3, ANC, 24h battery life, IPX5.',
     basePriceCents: 1299,
     imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80'
   }),
   aliexpress: async (url) => ({
-    supplier: 'aliexpress',
-    url,
+    supplier: 'aliexpress', url,
     title: 'AliExpress Sample Product',
     description: 'Placeholder — connect AliExpress Open Platform API in production.',
     basePriceCents: 899,
     imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&q=80'
   }),
   cj: async (url) => ({
-    supplier: 'cj',
-    url,
+    supplier: 'cj', url,
     title: 'CJ Dropshipping Sample Product',
     description: 'Placeholder — connect CJ OAuth API in production.',
     basePriceCents: 1599,
@@ -325,17 +324,17 @@ const suppliers = {
   })
 };
 
-/* ---------- AI copywriter ---------- */
+/* ---------- AI ---------- */
 async function generateCopy(raw) {
-  const fallbackPrice = Math.round(raw.basePriceCents * (1 + settings.markup / 100));
+  const priceCents = Math.round(raw.basePriceCents * (1 + settings.markup / 100));
   const fallback = {
     title: raw.title,
     description: `${raw.title} — premium quality, fast shipping, backed by ZYVANTRO. ${raw.description}`,
-    priceCents: fallbackPrice
+    priceCents
   };
 
   if (!settings.apiKey) {
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 400));
     return fallback;
   }
 
@@ -355,8 +354,7 @@ async function generateCopy(raw) {
           { role: 'user', content:
 `You are ZYVANTRO's product copywriter.
 Return strict JSON: { "title": string, "description": string, "priceCents": integer }.
-Title < 70 chars. Description 80-140 words, persuasive.
-Suggested retail in cents should be based on base price ${raw.basePriceCents} with ~${settings.markup}% markup.
+Title < 70 chars. Description 80-140 words. Suggested retail in cents (base ${raw.basePriceCents}, ~${settings.markup}% markup).
 Product: ${JSON.stringify(raw)}` }
         ]
       })
@@ -376,7 +374,7 @@ Product: ${JSON.stringify(raw)}` }
   }
 }
 
-/* ---------- Import flow ---------- */
+/* ---------- import ---------- */
 document.getElementById('btn-import').addEventListener('click', async () => {
   const supplier = document.getElementById('supplier').value;
   const url = document.getElementById('import-url').value.trim();
@@ -389,7 +387,6 @@ document.getElementById('btn-import').addEventListener('click', async () => {
   try {
     const raw = await suppliers[supplier](url);
     const copy = await generateCopy(raw);
-
     const product = {
       id: Date.now(),
       supplier,
@@ -400,7 +397,6 @@ document.getElementById('btn-import').addEventListener('click', async () => {
       imageUrl: raw.imageUrl,
       createdAt: new Date().toISOString()
     };
-
     products.unshift(product);
     saveAll();
     renderAll();
@@ -423,6 +419,7 @@ document.getElementById('btn-import').addEventListener('click', async () => {
     toast('Product imported & published', 'success');
     document.getElementById('import-url').value = '';
   } catch (err) {
+    console.error(err);
     toast('Import failed: ' + err.message, 'error');
   } finally {
     btn.disabled = false;
@@ -430,8 +427,8 @@ document.getElementById('btn-import').addEventListener('click', async () => {
   }
 });
 
-/* ---------- Order flow ---------- */
-function simulateOrder(productId) {
+/* ---------- buy / order ---------- */
+window.simulateOrder = function(productId) {
   const email = prompt('Customer email for the order:');
   if (!email) return;
 
@@ -446,9 +443,8 @@ function simulateOrder(productId) {
   orders.unshift(order);
   saveAll();
   renderAll();
-  toast('Order placed — queued for fulfillment', 'success');
+  toast('Order placed — queued', 'success');
 
-  // Simulate async worker
   setTimeout(() => {
     order.status = 'processing'; saveAll(); renderAll();
     setTimeout(() => {
@@ -458,9 +454,9 @@ function simulateOrder(productId) {
       toast('Order fulfilled by supplier', 'success');
     }, 1800);
   }, 800);
-}
+};
 
-/* ---------- Rendering ---------- */
+/* ---------- render helpers ---------- */
 function escapeHtml(s = '') {
   return String(s).replace(/[&<>"']/g, c => ({
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
@@ -477,8 +473,7 @@ function renderDashboard() {
       return sum + (p ? p.priceCents : 0);
     }, 0);
   document.getElementById('stat-revenue').textContent = '$' + (revenue / 100).toFixed(2);
-  document.getElementById('stat-fulfilled').textContent =
-    orders.filter(o => o.status === 'fulfilled').length;
+  document.getElementById('stat-fulfilled').textContent = orders.filter(o => o.status === 'fulfilled').length;
 
   const recent = orders.slice(0, 5);
   document.getElementById('recent-orders').innerHTML = recent.length
@@ -499,5 +494,88 @@ function renderDashboard() {
 function renderProducts() {
   const grid = document.getElementById('product-grid');
   if (!products.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
-      <div cl
+    grid.innerHTML = `<div class="empty" style="grid-column:1/-1"><div class="icon">🛍️</div>No products yet. Import one to get started.</div>`;
+    return;
+  }
+  grid.innerHTML = products.map(p => `
+    <div class="product-card">
+      <img class="product-img" src="${p.imageUrl}" onerror="this.src='https://via.placeholder.com/300?text=ZYVANTRO'" />
+      <div class="product-body">
+        <span class="badge supplier" style="align-self:flex-start">${p.supplier}</span>
+        <div class="product-title">${escapeHtml(p.title)}</div>
+        <div class="product-desc">${escapeHtml(p.description).slice(0,140)}…</div>
+        <div class="row" style="justify-content:space-between;margin-top:auto">
+          <div class="product-price">$${(p.priceCents/100).toFixed(2)}</div>
+          <button type="button" class="primary" onclick="simulateOrder(${p.id})">Buy</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderOrders() {
+  const el = document.getElementById('orders-table');
+  if (!orders.length) {
+    el.innerHTML = `<div class="empty"><div class="icon">📦</div>No orders yet</div>`;
+    return;
+  }
+  el.innerHTML = `<table><thead><tr>
+      <th>Order ID</th><th>Product</th><th>Customer</th>
+      <th>Status</th><th>Supplier Ref</th><th>Created</th>
+    </tr></thead><tbody>
+    ${orders.map(o => {
+      const p = products.find(p => p.id === o.productId);
+      return `<tr>
+        <td>#${o.id.toString().slice(-6)}</td>
+        <td>${p ? escapeHtml(p.title) : '—'}</td>
+        <td>${escapeHtml(o.email)}</td>
+        <td><span class="badge ${o.status}">${o.status}</span></td>
+        <td class="muted">${o.supplierOrderId || '—'}</td>
+        <td class="muted">${new Date(o.createdAt).toLocaleString()}</td>
+      </tr>`;
+    }).join('')}
+    </tbody></table>`;
+}
+
+function renderAll() {
+  renderDashboard();
+  renderProducts();
+  renderOrders();
+}
+
+/* ---------- settings ---------- */
+document.getElementById('btn-save-settings').addEventListener('click', () => {
+  settings.apiKey = document.getElementById('openai-key').value.trim();
+  settings.model  = document.getElementById('openai-model').value.trim() || 'gpt-4o-mini';
+  settings.markup = Number(document.getElementById('markup').value) || 250;
+  saveAll();
+  toast('Settings saved', 'success');
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  if (!confirm('Delete all products, orders and settings?')) return;
+  localStorage.clear();
+  products = []; orders = [];
+  settings = { apiKey: '', model: 'gpt-4o-mini', markup: 250 };
+  document.getElementById('openai-key').value = '';
+  document.getElementById('openai-model').value = 'gpt-4o-mini';
+  document.getElementById('markup').value = 250;
+  renderAll();
+  toast('All data reset', 'info');
+});
+
+/* ---------- boot ---------- */
+try {
+  document.getElementById('openai-key').value = settings.apiKey;
+  document.getElementById('openai-model').value = settings.model;
+  document.getElementById('markup').value = settings.markup;
+  renderAll();
+  console.log('[ZYVANTRO] booted OK — products:', products.length, 'orders:', orders.length);
+} catch (err) {
+  console.error('[ZYVANTRO] boot error:', err);
+  document.body.insertAdjacentHTML('afterbegin',
+    `<div style="background:#ef4444;color:#fff;padding:12px;font-family:monospace">ZYVANTRO boot error: ${err.message}</div>`);
+}
+</script>
+</body>
+</html>
